@@ -7,6 +7,7 @@ import argparse
 import pprint
 import os
 import logging
+import difflib
 
 def parseArguments():
     """Parse the command-line arguments."""
@@ -74,6 +75,15 @@ def mergeURLS(inputs):
             raise
     return urls
 
+def fuzzySearch(urls, files, threshold=0.32):
+    """Return a mapping of filenames that approximately match URLs."""
+    mapping = {}
+    for url in urls:
+        matches = difflib.get_close_matches(url, files, 5, threshold)
+        if matches:
+            mapping[url] = matches
+    return mapping
+
 def main():
     """Start execution of gen301."""
     inputs = []
@@ -97,6 +107,8 @@ def main():
             files = files.union(set(os.listdir(dir)))
     except Exception as e:
         logging.error(e)
+
+    redirects = fuzzySearch(urls, files)
 
 if __name__ == "__main__":
     main()
