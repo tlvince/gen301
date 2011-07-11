@@ -63,6 +63,17 @@ class GoogleCSV(InputFormat):
             urls.add(line)
         return urls
 
+def mergeURLS(inputs):
+    """Create a unique set of URLs from the given input formats."""
+    urls = set()
+    for i in inputs:
+        # Re-raise any exceptions
+        try:
+            urls = urls.union(i.urls())
+        except:
+            raise
+    return urls
+
 def main():
     """Start execution of gen301."""
     args = parseArguments()
@@ -71,12 +82,18 @@ def main():
     logging.basicConfig(format="%(filename)s: %(levelname)s: %(message)s",
         level=logging.DEBUG)
 
-    # Merge URLs from input formats
-    urls = set()
+    # Create a list of input format objects
+    inputs = []
     for gcsv in args.gcsv.split():
-        urls = urls.union(GoogleCSV(gcsv).urls())
+        inputs.append(GoogleCSV(gcsv))
     for plain in args.plain.split():
-        urls = urls.union(Plain(plain).urls())
+        inputs.append(Plain(plain))
+
+    # Get unique URLs and log any exceptions
+    try:
+        urls = mergeURLS(inputs)
+    except Exception as e:
+        logging.error(e)
 
 if __name__ == "__main__":
     main()
