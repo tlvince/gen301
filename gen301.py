@@ -15,9 +15,9 @@ def parseArguments():
 
     input = parser.add_argument_group("input",
         description="Supported URL list formats.")
-    input.add_argument("--gcsv", nargs="?",
+    input.add_argument("-g", "--gcsv", nargs="?",
         help="path to Google craw error csv file(s)")
-    input.add_argument("--plain", nargs="?",
+    input.add_argument("-p", "--plain", nargs="?",
         help="path to newline separated file(s)")
 
     output = parser.add_argument_group("output",
@@ -26,10 +26,17 @@ def parseArguments():
                "csv":  "comma separated"}
     output.add_argument("-o", "--output", choices=formats.keys(), default="csv",
         help="an output format; one of: " + pprint.saferepr(formats))
+    output.add_argument("-e", "--ext", action="store_true",
+        help="preserve filename extension in output")
 
-    parser.add_argument("--dirs", nargs="?", default=".",
+    files = parser.add_argument_group("files",
+        description="Heuristics regarding filename format.")
+    files.add_argument("-u", "--utc", action="store_true",
+        help="filenames start with a date in UTC format")
+
+    parser.add_argument("-d", "--dirs", nargs="?", default=".",
         help="path to directory(s) of files")
-    parser.add_argument("--cutoff", default=0.32, type=float,
+    parser.add_argument("-c", "--cutoff", default=0.32, type=float,
         help="fuzzy search threshold (float, defaults to: 0.32)")
 
     return parser.parse_args()
