@@ -123,6 +123,22 @@ class CSV(OutputFormat):
                 lines.append("{0}, {1}/{2}".format(url, prefix, match))
         return "\n".join([line for line in lines])
 
+def formatFiles(path, utc, ext):
+    """Return a list of files in the given path, with optional formatting."""
+    files = os.listdir(path)
+    if utc:
+        # Subsitute dashes for slashes a leading UTC date:
+        #   YYYY-MM-DD- => YYYY/MM/DD/
+        for index, value in enumerate(files):
+            files[index] = value[:11].replace("-", "/") + value[11:]
+    if ext:
+        # Substitute the file extension with a slash
+        #   file.mkd    => file/
+        for index, value in enumerate(files):
+            name, ext = os.path.splitext(value)
+            files[index] = name + "/"
+    return files
+
 def main():
     """Start execution of gen301."""
     inputs = []
@@ -143,7 +159,7 @@ def main():
 
         urls = mergeURLS(inputs)
         for dir in args.dirs.split():
-            files = files.union(set(os.listdir(dir)))
+            files = files.union(formatFiles(dir, args.utc, args.ext))
         redirects = fuzzySearch(urls, files, args.matches, args.cutoff)
 
     except Exception as e:
