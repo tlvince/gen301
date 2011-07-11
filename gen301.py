@@ -114,28 +114,32 @@ class OutputFormat:
     def __str__(self):
         """Pretty print redirects."""
         return pprint.pformat(self.redirects)
-    def formatter(self, formatString="{0} {2}"):
+    def formatter(self, formatString="{old} {new}"):
         """Return redirects in the format specified by formatString."""
         lines = []
         for url in self.redirects.keys():
             for match in self.redirects[url]:
                 parsed = urlparse(url)
+
                 netloc = parsed.netloc
                 if self.subdomain:
                     netloc = netloc[(netloc.find(".")+1):]
+
                 prefix = "{0}://{1}".format(parsed.scheme, netloc)
-                lines.append(formatString.format(url, prefix, match))
+
+                lines.append(formatString.format(old=url, oldPath=parsed.path,
+                    prefix=prefix, new=match))
         return "\n".join([line for line in lines])
 
 class CSV(OutputFormat):
     def __str__(self):
         """Print redirects in a commar separated format."""
-        return super().formatter("{0}, {1}/{2}")
+        return super().formatter("{old}, {prefix}/{new}")
 
 class Rack(OutputFormat):
     def __str__(self):
         """Print redirects in rack-rewrite format."""
-        return super().formatter("r301 '{0}', '{2}'")
+        return super().formatter("r301 '{oldPath}', '/{new}'")
 
 def formatFiles(path, utc, ext):
     """Return a list of files in the given path, with optional formatting."""
