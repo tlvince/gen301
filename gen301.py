@@ -132,6 +132,11 @@ class CSV(OutputFormat):
         """Print redirects in a commar separated format."""
         return super().formatter("{0}, {1}/{2}")
 
+class Rack(OutputFormat):
+    def __str__(self):
+        """Print redirects in rack-rewrite format."""
+        return super().formatter("r301 '{0}', '{2}'")
+
 def formatFiles(path, utc, ext):
     """Return a list of files in the given path, with optional formatting."""
     files = os.listdir(path)
@@ -179,10 +184,10 @@ def main():
     except Exception as e:
         logging.error(e)
 
-    if args.output is "csv":
+    if args.output == "csv":
         out = CSV(redirects, args.subdomain)
-    elif args.output is "rack":
-        out = Rack(redirect, args.subdomain)
+    elif args.output == "rack":
+        out = Rack(redirects, args.subdomain)
     else:
         out = OutputFormat(redirects, args.subdomain)
 
