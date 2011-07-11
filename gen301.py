@@ -30,19 +30,16 @@ def parseArguments():
 
     return parser.parse_args()
 
-def readFile(path):
-    """Return the contents of the given file."""
-    path = os.path.expanduser(path)
-    with open(path, encoding="utf-8") as f:
-        return f.read().splitlines()
-
 class InputFormat:
     """Base class for supported formats."""
     def __init__(self, path):
         """Constructor for objects of class InputFormat."""
         self.path = path
     def read(self):
-        return readFile(self.path)
+        """Return the contents of the given file."""
+        path = os.path.expanduser(self.path)
+        with open(path, encoding="utf-8") as f:
+            return f.read().splitlines()
     def urls(self):
         return set(self.read())
 
@@ -68,6 +65,13 @@ class GoogleCSV(InputFormat):
 def main():
     """Start execution of gen301."""
     args = parseArguments()
+
+    # Merge URLs from input formats
+    urls = set()
+    for gcsv in args.gcsv.split():
+        urls = urls.union(GoogleCSV(gcsv).urls())
+    for plain in args.plain.split():
+        urls = urls.union(Plain(plain).urls())
 
 if __name__ == "__main__":
     main()
