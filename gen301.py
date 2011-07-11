@@ -36,6 +36,18 @@ def readFile(path):
     with open(path, encoding="utf-8") as f:
         return f.read().splitlines()
 
+def filterGCSV(gcsv):
+    """Return a set of URLs from a Google crawl error CSV file."""
+    header = "URL,Linked From,Discovery Date"
+    if gcsv[0] != header:
+        raise Exception("Unexpected CSV format")
+    urls = set()
+    for line in gcsv[1:]:
+        # Get everything before the first commar (just the URL)
+        line = line[:line.find(",")]
+        urls.add(line)
+    return urls
+
 def main():
     """Start execution of gen301."""
     args = parseArguments()
