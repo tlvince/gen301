@@ -29,6 +29,11 @@ def parseArguments():
 
     return parser.parse_args()
 
+def readFile(path):
+    """Return the contents of the given file."""
+    with open(path, encoding="utf-8") as f:
+        return f.read().splitlines()
+
 def main():
     """Start execution of gen301."""
     args = parseArguments()
