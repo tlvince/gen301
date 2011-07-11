@@ -26,8 +26,8 @@ def parseArguments():
     output.add_argument("-o", "--output", choices=formats.keys(), default="csv",
         help="an output format; one of: " + pprint.saferepr(formats))
 
-    parser.add_argument("--dir", nargs="?",
-        help="path to directory of files")
+    parser.add_argument("--dirs", nargs="?", default=".",
+        help="path to directory(s) of files")
 
     return parser.parse_args()
 
@@ -74,8 +74,20 @@ def mergeURLS(inputs):
             raise
     return urls
 
+def filterFilename(path):
+    "Return a set of filenames (sans extension) from the given path."""
+    names = set()
+    for root, dirs, files in os.walk(path):
+        for f in files:
+            name, ext = os.path.splitext(f)
+            names.add(name)
+    return names
+
 def main():
     """Start execution of gen301."""
+    inputs = []
+    files = set()
+
     args = parseArguments()
 
      # Configure the stdout logger
@@ -83,15 +95,15 @@ def main():
         level=logging.DEBUG)
 
     # Create a list of input format objects
-    inputs = []
     for gcsv in args.gcsv.split():
         inputs.append(GoogleCSV(gcsv))
     for plain in args.plain.split():
         inputs.append(Plain(plain))
 
-    # Get unique URLs and log any exceptions
     try:
         urls = mergeURLS(inputs)
+        for dir in args.dirs:
+            files = files.union(filterFilename(dir))
     except Exception as e:
         logging.error(e)
 
