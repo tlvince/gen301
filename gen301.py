@@ -5,6 +5,7 @@
 
 import argparse
 import pprint
+import os.path
 
 def parseArguments():
     """Parse the command-line arguments."""
@@ -14,14 +15,14 @@ def parseArguments():
         description="Supported URL list formats.")
     input.add_argument("--gcsv", nargs="?",
         help="path to Google craw error csv file(s)")
-    input.add_argument("--file", nargs="?",
+    input.add_argument("--plain", nargs="?",
         help="path to newline separated file(s)")
 
     output = parser.add_argument_group("output",
         description="Supported output formats.")
     formats = {"rack": "rack-rewrite 301 static redirect",
                "csv":  "comma separated"}
-    output.add_argument("-o", "--output", choices=formats.keys(),
+    output.add_argument("-o", "--output", choices=formats.keys(), default="csv",
         help="an output format; one of: " + pprint.saferepr(formats))
 
     parser.add_argument("--dir", nargs="?",
@@ -31,6 +32,7 @@ def parseArguments():
 
 def readFile(path):
     """Return the contents of the given file."""
+    path = os.path.expanduser(path)
     with open(path, encoding="utf-8") as f:
         return f.read().splitlines()
 
