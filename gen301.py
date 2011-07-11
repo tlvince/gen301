@@ -26,8 +26,9 @@ def parseArguments():
         description="Supported output formats.")
     formats = {"rack": "rack-rewrite 301 static redirect",
                "csv":  "comma separated"}
-    output.add_argument("-o", "--output", choices=formats.keys(), default="csv",
-        help="an output format; one of: " + pprint.saferepr(formats))
+    output.add_argument("-o", "--output", choices=formats.keys(),
+        help="an output format; one of: " + pprint.saferepr(formats) +
+             " else, a machine-readable format")
     output.add_argument("-e", "--ext", action="store_true",
         help="remove file extension in redirects")
     output.add_argument("-s", "--subdomain", action="store_true",
