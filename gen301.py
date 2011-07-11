@@ -114,10 +114,8 @@ class OutputFormat:
     def __str__(self):
         """Pretty print redirects."""
         return pprint.pformat(self.redirects)
-
-class CSV(OutputFormat):
-    def __str__(self):
-        """Print redirects in a commar separated format."""
+    def formatter(self, formatString="{0} {2}"):
+        """Return redirects in the format specified by formatString."""
         lines = []
         for url in self.redirects.keys():
             for match in self.redirects[url]:
@@ -126,8 +124,13 @@ class CSV(OutputFormat):
                 if self.subdomain:
                     netloc = netloc[(netloc.find(".")+1):]
                 prefix = "{0}://{1}".format(parsed.scheme, netloc)
-                lines.append("{0}, {1}/{2}".format(url, prefix, match))
+                lines.append(formatString.format(url, prefix, match))
         return "\n".join([line for line in lines])
+
+class CSV(OutputFormat):
+    def __str__(self):
+        """Print redirects in a commar separated format."""
+        return super().formatter("{0}, {1}/{2}")
 
 def formatFiles(path, utc, ext):
     """Return a list of files in the given path, with optional formatting."""
