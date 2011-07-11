@@ -6,6 +6,7 @@
 import argparse
 import pprint
 import os.path
+import logging
 
 def parseArguments():
     """Parse the command-line arguments."""
@@ -31,7 +32,7 @@ def parseArguments():
     return parser.parse_args()
 
 class InputFormat:
-    """Base class for supported formats."""
+    """Base class for supported inputs."""
     def __init__(self, path):
         """Constructor for objects of class InputFormat."""
         self.path = path
@@ -65,6 +66,10 @@ class GoogleCSV(InputFormat):
 def main():
     """Start execution of gen301."""
     args = parseArguments()
+
+     # Configure the stdout logger
+    logging.basicConfig(format="%(filename)s: %(levelname)s: %(message)s",
+        level=logging.DEBUG)
 
     # Merge URLs from input formats
     urls = set()
