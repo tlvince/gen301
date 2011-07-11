@@ -91,11 +91,11 @@ def mergeURLS(inputs):
             raise
     return urls
 
-def fuzzySearch(urls, files, matches, cutoff):
+def fuzzySearch(urls, files, n, cutoff):
     """Return a mapping of filenames that approximately match URLs."""
     mapping = {}
     for url in urls:
-        matches = difflib.get_close_matches(url, files, matches, cutoff)
+        matches = difflib.get_close_matches(url, files, n, cutoff)
         if matches:
             mapping[url] = matches
     return mapping
@@ -144,7 +144,6 @@ def main():
         urls = mergeURLS(inputs)
         for dir in args.dirs.split():
             files = files.union(set(os.listdir(dir)))
-
         redirects = fuzzySearch(urls, files, args.matches, args.cutoff)
 
     except Exception as e:
