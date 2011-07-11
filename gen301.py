@@ -16,7 +16,7 @@ def parseArguments():
     input = parser.add_argument_group("input",
         description="Supported URL list formats.")
     input.add_argument("-g", "--gcsv", nargs="?",
-        help="path to Google craw error csv file(s)")
+        help="path to Google crawl error csv file(s)")
     input.add_argument("-p", "--plain", nargs="?",
         help="path to newline separated file(s)")
 
