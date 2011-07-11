@@ -1,0 +1,22 @@
+gen301
+======
+
+Generate HTTP 301 redirect rules from URL lists and filenames.
+
+From a supported input format of URLs, fuzzy search a directory for filenames
+that are a sub-string of a URL and output a mapping in one of the supported
+output formats.
+
+Input formats
+-------------
+
+An input format can be one (or any) of:
+
+* Google Webmaster Tools crawl errors CSV file
+* A newline separated list of URLs
+
+Output formats
+--------------
+
+* rack-rewrite 301 static redirect
+* Comma separated list
