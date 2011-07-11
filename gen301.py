@@ -36,10 +36,15 @@ def parseArguments():
     files.add_argument("-u", "--utc", action="store_true",
         help="filenames start with a date in UTC format")
 
+    search = parser.add_argument_group("search",
+        description="Fuzzy search parameters.")
+    search.add_argument("-c", "--cutoff", default=0.32, type=float,
+        help="fuzzy search threshold (float, defaults to: 0.32)")
+    search.add_argument("-m", "--matches", default=1, type=int,
+        help="number of fuzzy search matches (int, defaults to: 1)")
+
     parser.add_argument("-d", "--dirs", nargs="?", default=".",
         help="path to directory(s) of files")
-    parser.add_argument("-c", "--cutoff", default=0.32, type=float,
-        help="fuzzy search threshold (float, defaults to: 0.32)")
 
     return parser.parse_args()
 
@@ -86,11 +91,11 @@ def mergeURLS(inputs):
             raise
     return urls
 
-def fuzzySearch(urls, files, cutoff):
+def fuzzySearch(urls, files, matches, cutoff):
     """Return a mapping of filenames that approximately match URLs."""
     mapping = {}
     for url in urls:
-        matches = difflib.get_close_matches(url, files, 5, cutoff)
+        matches = difflib.get_close_matches(url, files, matches, cutoff)
         if matches:
             mapping[url] = matches
     return mapping
@@ -112,10 +117,10 @@ class CSV(OutputFormat):
         """Print redirects in a commar separated format."""
         lines = []
         for url in self.redirects.keys():
-            parsed = urlparse(url)
-            prefix = "{0}://{1}".format(parsed.scheme, parsed.netloc)
-            lines.append("{0}, {1}/{2}".format(url, prefix,
-                self.redirects[url][0]))
+            for match in self.redirects[url]:
+                parsed = urlparse(url)
+                prefix = "{0}://{1}".format(parsed.scheme, parsed.netloc)
+                lines.append("{0}, {1}/{2}".format(url, prefix, match))
         return "\n".join([line for line in lines])
 
 def main():
@@ -140,7 +145,7 @@ def main():
         for dir in args.dirs.split():
             files = files.union(set(os.listdir(dir)))
 
-        redirects = fuzzySearch(urls, files, args.cutoff)
+        redirects = fuzzySearch(urls, files, args.matches, args.cutoff)
 
     except Exception as e:
         logging.error(e)
