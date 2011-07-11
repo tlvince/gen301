@@ -29,7 +29,9 @@ def parseArguments():
     output.add_argument("-o", "--output", choices=formats.keys(), default="csv",
         help="an output format; one of: " + pprint.saferepr(formats))
     output.add_argument("-e", "--ext", action="store_true",
-        help="strip file extension in output")
+        help="remove file extension in redirects")
+    output.add_argument("-s", "--subdomain", action="store_true",
+        help="remove subdomains in redirects")
 
     files = parser.add_argument_group("files",
         description="Heuristics regarding filename format.")
