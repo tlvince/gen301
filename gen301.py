@@ -29,6 +29,8 @@ def parseArguments():
 
     parser.add_argument("--dirs", nargs="?", default=".",
         help="path to directory(s) of files")
+    parser.add_argument("--thresh", default=0.32, type=float,
+        help="fuzzy search threshold (float, defaults to: 0.32)")
 
     return parser.parse_args()
 
@@ -75,7 +77,7 @@ def mergeURLS(inputs):
             raise
     return urls
 
-def fuzzySearch(urls, files, threshold=0.32):
+def fuzzySearch(urls, files, threshold):
     """Return a mapping of filenames that approximately match URLs."""
     mapping = {}
     for url in urls:
@@ -108,7 +110,7 @@ def main():
     except Exception as e:
         logging.error(e)
 
-    redirects = fuzzySearch(urls, files)
+    redirects = fuzzySearch(urls, files, args.thresh)
 
 if __name__ == "__main__":
     main()
