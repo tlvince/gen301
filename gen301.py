@@ -163,9 +163,14 @@ def main():
         for plain in args.plain.split():
             inputs.append(Plain(plain))
 
+        # Get the URLs
         urls = mergeURLS(inputs)
+
+        # Get the files
         for dir in args.dirs.split():
             files = files.union(formatFiles(dir, args.utc, args.ext))
+
+        # Search for matches
         redirects = fuzzySearch(urls, files, args.matches, args.cutoff)
 
     except Exception as e:
@@ -179,5 +184,6 @@ def main():
         out = OutputFormat(redirects, args.subdomain)
 
     print(out)
+
 if __name__ == "__main__":
     main()
