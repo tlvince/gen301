@@ -36,17 +36,34 @@ def readFile(path):
     with open(path, encoding="utf-8") as f:
         return f.read().splitlines()
 
-def filterGCSV(gcsv):
-    """Return a set of URLs from a Google crawl error CSV file."""
-    header = "URL,Linked From,Discovery Date"
-    if gcsv[0] != header:
-        raise Exception("Unexpected CSV format")
-    urls = set()
-    for line in gcsv[1:]:
-        # Get everything before the first commar (just the URL)
-        line = line[:line.find(",")]
-        urls.add(line)
-    return urls
+class InputFormat:
+    """Base class for supported formats."""
+    def __init__(self, path):
+        """Constructor for objects of class InputFormat."""
+        self.path = path
+    def read(self):
+        return readFile(self.path)
+    def urls(self):
+        return set(self.read())
+
+class Plain(InputFormat):
+    """Plain text format."""
+    pass
+
+class GoogleCSV(InputFormat):
+    """Google CSV input format."""
+    def urls(self):
+        """Return a set of URLs from a Google crawl error CSV file."""
+        header = "URL,Linked From,Discovery Date"
+        gcsv = self.read()
+        if gcsv[0] != header:
+            raise Exception("Unexpected CSV format")
+        urls = set()
+        for line in gcsv[1:]:
+            # Get everything before the first commar (just the URL)
+            line = line[:line.find(",")]
+            urls.add(line)
+        return urls
 
 def main():
     """Start execution of gen301."""
