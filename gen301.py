@@ -9,6 +9,8 @@ import os
 import logging
 import difflib
 
+from urllib.parse import urlparse
+
 def parseArguments():
     """Parse the command-line arguments."""
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
@@ -93,6 +95,29 @@ def fuzzySearch(urls, files, cutoff):
             mapping[url] = matches
     return mapping
 
+class OutputFormat:
+    """Base class for supported outputs."""
+    def __init__(self, redirects):
+        """Constructor."""
+        self.redirects = redirects
+    def __repr__(self):
+        """Return a machine-readable output of the redirects."""
+        return pprint.saferepr(self.redirects)
+    def __str__(self):
+        """Pretty print redirects."""
+        return pprint.pformat(self.redirects)
+
+class CSV(OutputFormat):
+    def __str__(self):
+        """Print redirects in a commar separated format."""
+        lines = []
+        for url in self.redirects.keys():
+            parsed = urlparse(url)
+            prefix = "{0}://{1}".format(parsed.scheme, parsed.netloc)
+            lines.append("{0}, {1}/{2}".format(url, prefix,
+                self.redirects[url][0]))
+        return "\n".join([line for line in lines])
+
 def main():
     """Start execution of gen301."""
     inputs = []
@@ -116,8 +141,17 @@ def main():
             files = files.union(set(os.listdir(dir)))
 
         redirects = fuzzySearch(urls, files, args.cutoff)
+
     except Exception as e:
         logging.error(e)
 
+    if args.output is "csv":
+        out = CSV(redirects)
+    elif args.output is "rack":
+        out = Rack(redirects)
+    else:
+        out = OutputFormat(redirects)
+
+    print(out)
 if __name__ == "__main__":
     main()
