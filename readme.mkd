@@ -24,6 +24,12 @@ Output formats
 Examples
 --------
 
-    $ gen301 --gcsv="/tmp/Web_crawl_error_sources_www_domain_com_20110711T030411Z.csv" --dir="~/proj/web/blog/entries" --output="rack"
-    r301 '/linux/local-music-scrobbling/', '/2010/09/28/local-music-scrobbling/'
-    r301 '/linux/tiling-window-managers/', '/2009/01/24/tiling-window-managers/'
+    $ gen301 -use \
+        --gcsv /tmp/Web_crawl_error_sources_www_tlvince_com_20110711T030411Z.csv" \
+        --plain /tmp/disqus-urls.csv \
+        --dirs ~/proj/blog/journal/entry \
+        --output rack | sort > /tmp/301s
+
+... which generated [these redirects][1] in production.
+
+  [1]: https://github.com/tlvince/tlvince.com/blob/master/config.ru#L41
