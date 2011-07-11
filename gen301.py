@@ -104,9 +104,10 @@ def fuzzySearch(urls, files, n, cutoff):
 
 class OutputFormat:
     """Base class for supported outputs."""
-    def __init__(self, redirects):
+    def __init__(self, redirects, subdomain):
         """Constructor."""
         self.redirects = redirects
+        self.subdomain = subdomain
     def __repr__(self):
         """Return a machine-readable output of the redirects."""
         return pprint.saferepr(self.redirects)
@@ -168,11 +169,11 @@ def main():
         logging.error(e)
 
     if args.output is "csv":
-        out = CSV(redirects)
+        out = CSV(redirects, args.subdomain)
     elif args.output is "rack":
-        out = Rack(redirects)
+        out = Rack(redirect, args.subdomain)
     else:
-        out = OutputFormat(redirects)
+        out = OutputFormat(redirects, args.subdomain)
 
     print(out)
 if __name__ == "__main__":
