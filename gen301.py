@@ -5,7 +5,7 @@
 
 import argparse
 import pprint
-import os.path
+import os
 import logging
 
 def parseArguments():
@@ -74,15 +74,6 @@ def mergeURLS(inputs):
             raise
     return urls
 
-def filterFilename(path):
-    "Return a set of filenames (sans extension) from the given path."""
-    names = set()
-    for root, dirs, files in os.walk(path):
-        for f in files:
-            name, ext = os.path.splitext(f)
-            names.add(name)
-    return names
-
 def main():
     """Start execution of gen301."""
     inputs = []
@@ -102,8 +93,8 @@ def main():
 
     try:
         urls = mergeURLS(inputs)
-        for dir in args.dirs:
-            files = files.union(filterFilename(dir))
+        for dir in args.dirs.split():
+            files = files.union(set(os.listdir(dir)))
     except Exception as e:
         logging.error(e)
 
