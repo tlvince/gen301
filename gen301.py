@@ -20,7 +20,7 @@ def parseArguments():
     output = parser.add_argument_group("output",
         description="Supported output formats.")
     formats = {"rack": "rack-rewrite 301 static redirect",
-               "csv":  "commar separated"}
+               "csv":  "comma separated"}
     output.add_argument("-o", "--output", choices=formats.keys(),
         help="an output format; one of: " + pprint.saferepr(formats))
 
