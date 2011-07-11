@@ -29,7 +29,7 @@ def parseArguments():
 
     parser.add_argument("--dirs", nargs="?", default=".",
         help="path to directory(s) of files")
-    parser.add_argument("--thresh", default=0.32, type=float,
+    parser.add_argument("--cutoff", default=0.32, type=float,
         help="fuzzy search threshold (float, defaults to: 0.32)")
 
     return parser.parse_args()
@@ -77,11 +77,11 @@ def mergeURLS(inputs):
             raise
     return urls
 
-def fuzzySearch(urls, files, threshold):
+def fuzzySearch(urls, files, cutoff):
     """Return a mapping of filenames that approximately match URLs."""
     mapping = {}
     for url in urls:
-        matches = difflib.get_close_matches(url, files, 5, threshold)
+        matches = difflib.get_close_matches(url, files, 5, cutoff)
         if matches:
             mapping[url] = matches
     return mapping
@@ -97,20 +97,20 @@ def main():
     logging.basicConfig(format="%(filename)s: %(levelname)s: %(message)s",
         level=logging.DEBUG)
 
-    # Create a list of input format objects
-    for gcsv in args.gcsv.split():
-        inputs.append(GoogleCSV(gcsv))
-    for plain in args.plain.split():
-        inputs.append(Plain(plain))
-
     try:
+        # Create a list of input format objects
+        for gcsv in args.gcsv.split():
+            inputs.append(GoogleCSV(gcsv))
+        for plain in args.plain.split():
+            inputs.append(Plain(plain))
+
         urls = mergeURLS(inputs)
         for dir in args.dirs.split():
             files = files.union(set(os.listdir(dir)))
+
+        redirects = fuzzySearch(urls, files, args.cutoff)
     except Exception as e:
         logging.error(e)
-
-    redirects = fuzzySearch(urls, files, args.thresh)
 
 if __name__ == "__main__":
     main()
