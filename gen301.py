@@ -122,7 +122,10 @@ class CSV(OutputFormat):
         for url in self.redirects.keys():
             for match in self.redirects[url]:
                 parsed = urlparse(url)
-                prefix = "{0}://{1}".format(parsed.scheme, parsed.netloc)
+                netloc = parsed.netloc
+                if self.subdomain:
+                    netloc = netloc[(netloc.find(".")+1):]
+                prefix = "{0}://{1}".format(parsed.scheme, netloc)
                 lines.append("{0}, {1}/{2}".format(url, prefix, match))
         return "\n".join([line for line in lines])
 
